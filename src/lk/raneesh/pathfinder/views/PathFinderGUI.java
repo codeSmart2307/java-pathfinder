@@ -4,17 +4,18 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import lk.raneesh.pathfinder.controllers.PathFinderController;
+import lk.raneesh.pathfinder.models.CellNode;
 import lk.raneesh.pathfinder.utility.GridWeight;
 
 public class PathFinderGUI extends Application {
@@ -23,9 +24,11 @@ public class PathFinderGUI extends Application {
     private GridPane controlGrid;
 
     private Text sourceCoordinates;
+    private Text destinationCoordinates;
+    private Text costIdentifierLabel;
+    private Text costLabel;
     private TextField sourceXInput;
     private TextField sourceYInput;
-    private Text destinationCoordinates;
     private TextField destinationXInput;
     private TextField destinationYInput;
     private RadioButton manhattanBtn;
@@ -58,7 +61,6 @@ public class PathFinderGUI extends Application {
     public GridPane generateLandscape() {
         landscapeGrid = new GridPane();
         landscapeGrid.setPadding(new Insets(0, 0, 0, 0));
-        //landscapeGrid.setPrefSize(500, 500);
         landscapeGrid.setMaxSize(800, 800);
         landscapeGrid.setStyle("-fx-background-color: #F4F4F4; -fx-background-image: url('images/landscape.PNG'); " +
                 "-fx-background-size: 710 640;");
@@ -81,11 +83,17 @@ public class PathFinderGUI extends Application {
 
         NumberBinding rectangleAreaSize = Bindings.min(landscapeGrid.heightProperty(), landscapeGrid.widthProperty());
 
-        for (int i = 0; i < GridWeight.getGridWeight().length; i++) {
-            for (int j = 0; j < GridWeight.getGridWeight()[i].length; j++) {
+        int[][] gridCellArr = GridWeight.getGridWeight();
+
+        for (int i = 0; i < gridCellArr.length; i++) {
+            for (int j = 0; j < gridCellArr.length; j++) {
                 Rectangle gridCell = new Rectangle();
 
-                switch(GridWeight.getGridWeight()[j][i]) {
+                CellNode gridCellNode = new CellNode(i, j);
+                gridCellNode.setNodeCost(gridCellArr[i][j]);
+                PathFinderController.gridNodes[i][j] = gridCellNode;
+
+                switch(gridCellArr[i][j]) {
                     case 1:
                         gridCell.setFill(Color.web("#009900"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
@@ -144,7 +152,7 @@ public class PathFinderGUI extends Application {
                         break;
                     default:
                         gridCell.setFill(Color.web("#00DD00"));
-                        gridCell.setStyle("-fx-background-color: #00DD00; -fx-opacity: 0.0;");
+                        gridCell.setStyle("-fx-opacity: 0.0;");
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#00FF00"));
                             gridCell.setStyle("-fx-opacity: 1;");
@@ -156,12 +164,13 @@ public class PathFinderGUI extends Application {
                         break;
                 }
 
-                landscapeGrid.add(gridCell, i, j);
+                landscapeGrid.add(gridCell, j, i);
 
                 gridCell.widthProperty().bind(rectangleAreaSize.divide(18));
                 gridCell.heightProperty().bind(rectangleAreaSize.divide(21));
             }
         }
+
         return landscapeGrid;
     }
 
@@ -267,6 +276,12 @@ public class PathFinderGUI extends Application {
         clearBtn.setOnMouseExited(event -> {
             clearBtn.setStyle("-fx-background-color: #EA2027; -fx-background-radius: 14;");
         });
+
+        costIdentifierLabel = new Text("TOTAL COST: ");
+        controlGrid.add(costIdentifierLabel, 6, 9, 3, 3);
+
+        costLabel = new Text("0");
+        controlGrid.add(costLabel, 8, 9, 3, 3);
 
         return controlGrid;
     }
