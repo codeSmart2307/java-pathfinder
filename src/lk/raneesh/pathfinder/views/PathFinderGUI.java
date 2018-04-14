@@ -160,6 +160,18 @@ public class PathFinderGUI extends Application {
                 PathFinderController.gridNodes[i][j] = gridCellNode;
 
                 switch(gridCellArr[i][j]) {
+                    case 1:
+                        gridCell.setFill(Color.web("#00DD00"));
+                        gridCell.setStyle("-fx-opacity: 0.0;");
+                        gridCell.setOnMouseEntered(event -> {
+                            gridCell.setFill(Color.web("#00FF00"));
+                            gridCell.setStyle("-fx-opacity: 1;");
+                        });
+                        gridCell.setOnMouseExited(event -> {
+                            gridCell.setFill(Color.web("#00DD00"));
+                            gridCell.setStyle("-fx-opacity: 0.0;");
+                        });
+                        break;
                     case 2:
                         gridCell.setFill(Color.web("#009900"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
@@ -203,7 +215,9 @@ public class PathFinderGUI extends Application {
                             gridCell.setStyle("-fx-opacity: 0.0;");
                         });
                         break;
-                    case 5:
+                    // Default case will be if the weight is 5 meaning a blocked node
+                    default:
+                        gridCellNode.setBlocked(true); // Node is initialized as a blocked node
                         gridCell.setFill(Color.web("#0000BB"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
 
@@ -216,18 +230,7 @@ public class PathFinderGUI extends Application {
                             gridCell.setStyle("-fx-opacity: 0.0;");
                         });
                         break;
-                    default:
-                        gridCell.setFill(Color.web("#00DD00"));
-                        gridCell.setStyle("-fx-opacity: 0.0;");
-                        gridCell.setOnMouseEntered(event -> {
-                            gridCell.setFill(Color.web("#00FF00"));
-                            gridCell.setStyle("-fx-opacity: 1;");
-                        });
-                        gridCell.setOnMouseExited(event -> {
-                            gridCell.setFill(Color.web("#00DD00"));
-                            gridCell.setStyle("-fx-opacity: 0.0;");
-                        });
-                        break;
+
                 }
 
                 landscapeGrid.add(gridCell, j, i);
