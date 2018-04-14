@@ -17,7 +17,7 @@ public class PathFinderController {
     public static String distanceMetric;
     public static CellNode[][] gridNodes = new CellNode[GridWeight.getGridWeight().length][GridWeight.getGridWeight().length];
     public static PriorityQueue<CellNode> openNodes;
-    public static ArrayList<CellNode> path;
+    public static ArrayList<CellNode> path = new ArrayList<>();
 
     public static void runPathfinder() {
 
@@ -79,7 +79,40 @@ public class PathFinderController {
             }
         });
 
+        // Runs search on the grid
         travelGrid();
+
+        // If the ending node has been visited
+        if (gridNodes[endI][endJ].isVisited()) {
+            // Build path
+            CellNode currentNode = gridNodes[endI][endJ];
+            path.add(currentNode);
+
+            while (currentNode.getParentNode() != null) {
+                // Add parent node to the path
+                path.add(currentNode.getParentNode());
+
+                // Ready for next parent node
+                currentNode = currentNode.getParentNode();
+            }
+
+            Alert pathFoundAlert = new Alert(Alert.AlertType.INFORMATION); //Alert popup of type "WARNING"
+            pathFoundAlert.setTitle("Path Found");
+            pathFoundAlert.setContentText("Path in " + distanceMetric + " distance metric found!");
+            pathFoundAlert.show();
+        }
+        else {
+            // If the end node has not been reached and the path has been obstructed in the middle
+            Alert pathAbsentAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+            pathAbsentAlert.setTitle("Path Not Found");
+            pathAbsentAlert.setContentText("Path in " + distanceMetric + " distance metric not found!");
+            pathAbsentAlert.show();
+        }
+
+        for (int i = 0; i < path.size(); i++) {
+            System.out.println(path.get(i));
+        }
+
     }
 
     public static void travelGrid() {
@@ -95,17 +128,18 @@ public class PathFinderController {
             // Remove the current node from the Priority Queue and initialize it to the currentNode variable
             currentNode = openNodes.poll();
 
+            // Current node has been visited and is not visitable anymore
+            gridNodes[currentNode.getI()][currentNode.getJ()].setVisited(true);
+
             // If no more open nodes are available, stop the search
             if (currentNode == null) {
                 break;
             }
+
             // If the current node is the destination node, stop the search
             if (currentNode.equals(gridNodes[endI][endJ])) {
                 return;
             }
-
-            // Current node has been visited and is not visitable anymore
-            gridNodes[currentNode.getI()][currentNode.getJ()].setVisited(true);
 
             CellNode tempNeighborNode;
 
@@ -151,11 +185,9 @@ public class PathFinderController {
 
             if (currentNode.getJ() + 1 < gridNodes.length) {
                 // Node to the right of the current node
-                tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() - 1];
+                tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() + 1];
                 updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
             }
-
-
         }
     }
 
