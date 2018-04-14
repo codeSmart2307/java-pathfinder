@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -31,11 +32,15 @@ public class PathFinderGUI extends Application {
     private TextField sourceYInput;
     private TextField destinationXInput;
     private TextField destinationYInput;
+    private ToggleGroup heuristicGroup;
     private RadioButton manhattanBtn;
     private RadioButton euclideanBtn;
     private RadioButton chebyshevBtn;
     private Button runBtn;
     private Button clearBtn;
+
+    public static final int ROWS = 20;
+    public static final int COLUMNS = 20;
 
 
     public static void main(String[] args) {
@@ -56,6 +61,70 @@ public class PathFinderGUI extends Application {
         primaryStage.setResizable(false);
         primaryStage.setTitle("Shortest Path Finder based on the A* Algorithm");
         primaryStage.show();
+
+        getInput();
+    }
+
+    public void getInput() {
+        runBtn.setOnMouseClicked(event -> {
+            if (!sourceXInput.getText().equals("") && !sourceYInput.getText().equals("") && !destinationXInput.getText().equals("") && !destinationYInput.getText().equals("")) {
+                try {
+                    if (Integer.parseInt(sourceXInput.getText()) >= 0 && Integer.parseInt(sourceXInput.getText()) <= (ROWS - 1)) {
+                        PathFinderController.startI = Integer.parseInt(sourceXInput.getText());
+                    } else {
+                        Alert sourceXAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        sourceXAlert.setTitle("Invalid Input Alert");
+                        sourceXAlert.setContentText("Starting Point X Coordinate Out of Bounds!");
+                        sourceXAlert.show();
+                    }
+                    if (Integer.parseInt(sourceYInput.getText()) >= 0 && Integer.parseInt(sourceYInput.getText()) <= (ROWS - 1)) {
+                        PathFinderController.startJ = Integer.parseInt(sourceYInput.getText());
+                    } else {
+                        Alert sourceYAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        sourceYAlert.setTitle("Invalid Input Alert");
+                        sourceYAlert.setContentText("Starting Point Y Coordinate Out of Bounds!");
+                        sourceYAlert.show();
+                    }
+                    if (Integer.parseInt(destinationXInput.getText()) >= 0 && Integer.parseInt(destinationXInput.getText()) <= (ROWS - 1)) {
+                        PathFinderController.endI = Integer.parseInt(destinationXInput.getText());
+                    } else {
+                        Alert destinationXAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        destinationXAlert.setTitle("Invalid Input Alert");
+                        destinationXAlert.setContentText("Ending Point X Coordinate Out of Bounds!");
+                        destinationXAlert.show();
+                    }
+                    if (Integer.parseInt(destinationYInput.getText()) >= 0 && Integer.parseInt(destinationYInput.getText()) <= (ROWS - 1)) {
+                        PathFinderController.endJ = Integer.parseInt(destinationYInput.getText());
+                    } else {
+                        Alert destinationYAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        destinationYAlert.setTitle("Invalid Input Alert");
+                        destinationYAlert.setContentText("Ending Point Y Coordinate Out of Bounds!");
+                        destinationYAlert.show();
+                    }
+                }
+                catch(NumberFormatException ex) {
+                    Alert numberFormatAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                    numberFormatAlert.setTitle("Invalid Input Alert");
+                    numberFormatAlert.setContentText("Input is not a number! Please try again");
+                    numberFormatAlert.show();
+                }
+            }
+            else {
+                Alert emptyFieldsAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                emptyFieldsAlert.setTitle("Empty Fields Alert");
+                emptyFieldsAlert.setContentText("Please fill all the fields!");
+                emptyFieldsAlert.show();
+            }
+
+            // Get selected radio button with distance metric
+            RadioButton selectedHeuristicBtn = (RadioButton) heuristicGroup.getSelectedToggle();
+            String heuristicValue = selectedHeuristicBtn.getText();
+            // Assign selected radio button value to distance metric variable in controller class
+            PathFinderController.distanceMetric = heuristicValue;
+
+            PathFinderController.runPathfinder();
+
+        });
     }
 
     public GridPane generateLandscape() {
@@ -66,18 +135,15 @@ public class PathFinderGUI extends Application {
                 "-fx-background-size: 710 640;");
         landscapeGrid.setGridLinesVisible(false);
 
-        int numRows = 20;
-        int numColumns = 20;
-
-        for (int i = 0 ; i < numRows ; i++) {
+        for (int i = 0 ; i < ROWS ; i++) {
             RowConstraints rowConstraints = new RowConstraints();
-            rowConstraints.setPercentHeight(100.0 / numRows); //Assigns a percentage of the vertical height for the number of rows specified.
+            rowConstraints.setPercentHeight(100.0 / ROWS); //Assigns a percentage of the vertical height for the number of rows specified.
             landscapeGrid.getRowConstraints().add(rowConstraints);
         }
 
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < COLUMNS; i++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
-            columnConstraints.setPercentWidth(100.0/ numColumns); //Assigns a percentage of the horizontal length for the number of columns specified.
+            columnConstraints.setPercentWidth(100.0/ COLUMNS); //Assigns a percentage of the horizontal length for the number of columns specified.
             landscapeGrid.getColumnConstraints().add(columnConstraints);
         }
 
@@ -90,11 +156,11 @@ public class PathFinderGUI extends Application {
                 Rectangle gridCell = new Rectangle();
 
                 CellNode gridCellNode = new CellNode(i, j);
-                gridCellNode.setNodeCost(gridCellArr[i][j]);
+                gridCellNode.setgCost(Integer.MAX_VALUE);
                 PathFinderController.gridNodes[i][j] = gridCellNode;
 
                 switch(gridCellArr[i][j]) {
-                    case 1:
+                    case 2:
                         gridCell.setFill(Color.web("#009900"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
 
@@ -109,7 +175,7 @@ public class PathFinderGUI extends Application {
                         });
 
                         break;
-                    case 2:
+                    case 3:
                         gridCell.setFill(Color.web("#005500"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
 
@@ -123,7 +189,7 @@ public class PathFinderGUI extends Application {
                             gridCell.setStyle("-fx-opacity: 0.0;");
                         });
                         break;
-                    case 3:
+                    case 4:
                         gridCell.setFill(Color.web("#777777"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
 
@@ -137,7 +203,7 @@ public class PathFinderGUI extends Application {
                             gridCell.setStyle("-fx-opacity: 0.0;");
                         });
                         break;
-                    case 4:
+                    case 5:
                         gridCell.setFill(Color.web("#0000BB"));
                         gridCell.setStyle("-fx-opacity: 0.0;");
 
@@ -231,7 +297,7 @@ public class PathFinderGUI extends Application {
         destinationYInput.setPrefWidth(30);
         controlGrid.add(destinationYInput, 10, 1, 2, 1);
 
-        ToggleGroup heuristicGroup = new ToggleGroup(); //Define Group for Radio Buttons for Heuristics
+        heuristicGroup = new ToggleGroup(); //Define Group for Radio Buttons for Heuristics
 
         //Radio Button for the Manhattan Distance Metric
         manhattanBtn = new RadioButton("Manhattan");
@@ -281,7 +347,7 @@ public class PathFinderGUI extends Application {
         controlGrid.add(costIdentifierLabel, 6, 9, 3, 3);
 
         costLabel = new Text("0");
-        controlGrid.add(costLabel, 8, 9, 3, 3);
+        controlGrid.add(costLabel, 8, 9, 8, 3);
 
         return controlGrid;
     }

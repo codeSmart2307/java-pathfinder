@@ -4,11 +4,12 @@ public class CellNode {
 
     private int i;
     private int j;
-    private int nodeCost;
-    private int heuristicCost;
-    private int finalCost;
+    private double gCost;
+    private double heuristicCost;
+    private double finalCost;
     private CellNode parentNode;
     private boolean isVisited;
+    private boolean isBlocked;
 
     public CellNode(int i, int j) {
         this.i = i;
@@ -31,27 +32,27 @@ public class CellNode {
         this.j = j;
     }
 
-    public int getNodeCost() {
-        return nodeCost;
+    public double getgCost() {
+        return gCost;
     }
 
-    public void setNodeCost(int nodeCost) {
-        this.nodeCost = nodeCost;
+    public void setgCost(double gCost) {
+        this.gCost = gCost;
     }
 
-    public int getHeuristicCost() {
+    public double getHeuristicCost() {
         return heuristicCost;
     }
 
-    public void setHeuristicCost(int heuristicCost) {
+    public void setHeuristicCost(double heuristicCost) {
         this.heuristicCost = heuristicCost;
     }
 
-    public int getFinalCost() {
+    public double getFinalCost() {
         return finalCost;
     }
 
-    public void setFinalCost(int finalCost) {
+    public void setFinalCost(double finalCost) {
         this.finalCost = finalCost;
     }
 
@@ -71,12 +72,20 @@ public class CellNode {
         isVisited = visited;
     }
 
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
     @Override
     public String toString() {
         return "CellNode{" +
                 "i=" + i +
                 ", j=" + j +
-                ", nodeCost=" + nodeCost +
+                ", gCost=" + gCost +
                 ", heuristicCost=" + heuristicCost +
                 ", finalCost=" + finalCost +
                 ", parentNode=" + parentNode +
