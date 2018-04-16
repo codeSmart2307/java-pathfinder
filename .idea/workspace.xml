@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e5ab5b74-b3f8-40b0-abb2-4bd0eb1ae3e4" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lk/raneesh/pathfinder/views/PathFinderGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lk/raneesh/pathfinder/views/PathFinderGUI.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,7 +14,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PathFinderGUI.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PathFinderGUI.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/lk/raneesh/pathfinder/views/PathFinderGUI.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="221">
@@ -30,11 +28,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PathFinderController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="PathFinderController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="240" column="9" selection-start-line="240" selection-start-column="9" selection-end-line="240" selection-end-column="9" />
+            <state relative-caret-position="170">
+              <caret line="133" column="16" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -126,8 +124,8 @@
         <option value="$PROJECT_DIR$/src/lk/raneesh/pathfinder/models/CellNode.java" />
         <option value="$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/Test.java" />
         <option value="$PROJECT_DIR$/src/lk/raneesh/pathfinder/utility/GridWeight.java" />
-        <option value="$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java" />
         <option value="$PROJECT_DIR$/src/lk/raneesh/pathfinder/views/PathFinderGUI.java" />
+        <option value="$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java" />
       </list>
     </option>
   </component>
@@ -388,12 +386,12 @@
       <updated>1522907164406</updated>
       <workItem from="1522907173687" duration="58692000" />
       <workItem from="1523636834111" duration="64242000" />
-      <workItem from="1523904463625" duration="804000" />
+      <workItem from="1523904463625" duration="976000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="123738000" />
+    <option name="totallyTimeSpent" value="123910000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1753" height="954" extended-state="6" />
@@ -656,16 +654,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="240" column="9" selection-start-line="240" selection-start-column="9" selection-end-line="240" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/lk/raneesh/pathfinder/views/PathFinderGUI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
@@ -674,6 +662,16 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1660#1661#0" expanded="true" />
             <element signature="e#1688#1689#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lk/raneesh/pathfinder/controllers/PathFinderController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="133" column="16" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

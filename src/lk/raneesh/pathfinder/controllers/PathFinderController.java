@@ -131,10 +131,6 @@ public class PathFinderController {
         try {
             // Traverse the grid till no more open nodes exist in the Priority Queue or destination has been reached
             while (true) {
-//                for (CellNode node: openNodes) {
-//                    System.out.println(node);
-//                }
-//                System.out.println("==================================================================================");
                 // Remove the current node from the Priority Queue and initialize it to the currentNode variable
                 currentNode = openNodes.remove();
 
