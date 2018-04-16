@@ -3,13 +3,15 @@ package lk.raneesh.pathfinder.views;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -64,6 +66,15 @@ public class PathFinderGUI extends Application {
         primaryStage.show();
 
         getInput();
+        clearGrid(primaryBorderPane);
+    }
+
+    public void clearGrid(BorderPane borderPane) {
+        clearBtn.setOnMouseClicked(event -> {
+            borderPane.setCenter(generateLandscape());
+            PathFinderController.openNodes = null;
+            PathFinderController.path = null;
+        });
     }
 
     public void getInput() {
@@ -129,28 +140,22 @@ public class PathFinderGUI extends Application {
 
             for (int i = 0; i < gridCellArr.length; i++) {
                 for (int j = 0; j < gridCellArr.length; j++) {
-
-                    boolean isNodePresent = false;
-                    for (int nodeValue = 0; nodeValue < PathFinderController.path.size(); nodeValue++) {
-                        if (PathFinderController.path.get(nodeValue).getI() == i && PathFinderController.path.get(nodeValue).getJ() == j) {
-                            isNodePresent = true;
+                    for (int k = 0; k < PathFinderController.path.size(); k++) {
+                        if (PathFinderController.path.get(k).getI() == i && PathFinderController.path.get(k).getJ() == j) {
+                            Circle pathCircle = new Circle();
+                            pathCircle.setFill(Color.web("#FF0000"));
+                            pathCircle.setRadius(15.0f);
+                            pathCircle.setStyle("-fx-opacity: 1;");
+                            landscapeGrid.add(pathCircle, j, i);
+                            break;
                         }
-                    }
-
-                    if (isNodePresent) {
-                        Circle pathCircle = new Circle();
-                        pathCircle.setFill(Color.web("#FF0000"));
-                        pathCircle.setStyle("-fx-opacity: 1;");
-                        landscapeGrid.add(pathCircle, j, i);
-                    }
-                    else {
-                        System.out.println("Node absent");
                     }
                 }
             }
-
-
+            costLabel.setText(String.valueOf(PathFinderController.gridNodes[PathFinderController.endI][PathFinderController.endJ].getFinalCost()));
         });
+
+
     }
 
     public GridPane generateLandscape() {
@@ -164,12 +169,14 @@ public class PathFinderGUI extends Application {
         for (int i = 0 ; i < ROWS ; i++) {
             RowConstraints rowConstraints = new RowConstraints();
             rowConstraints.setPercentHeight(100.0 / ROWS); //Assigns a percentage of the vertical height for the number of rows specified.
+            rowConstraints.setValignment(VPos.CENTER);
             landscapeGrid.getRowConstraints().add(rowConstraints);
         }
 
         for (int i = 0; i < COLUMNS; i++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
             columnConstraints.setPercentWidth(100.0/ COLUMNS); //Assigns a percentage of the horizontal length for the number of columns specified.
+            columnConstraints.setHalignment(HPos.CENTER);
             landscapeGrid.getColumnConstraints().add(columnConstraints);
         }
 
@@ -188,19 +195,19 @@ public class PathFinderGUI extends Application {
                 switch(gridCellArr[i][j]) {
                     case 1:
                         gridCell.setFill(Color.web("#00DD00"));
-                        gridCell.setStyle("-fx-opacity: 1;");
+                        gridCell.setStyle("-fx-opacity: 0;");
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#00FF00"));
                             gridCell.setStyle("-fx-opacity: 1;");
                         });
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#00DD00"));
-                            gridCell.setStyle("-fx-opacity: 1;");
+                            gridCell.setStyle("-fx-opacity: 0;");
                         });
                         break;
                     case 2:
                         gridCell.setFill(Color.web("#009900"));
-                        gridCell.setStyle("-fx-opacity: 1;");
+                        gridCell.setStyle("-fx-opacity: 0;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#00BB00"));
@@ -209,13 +216,13 @@ public class PathFinderGUI extends Application {
 
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#009900"));
-                            gridCell.setStyle("-fx-opacity: 1;");
+                            gridCell.setStyle("-fx-opacity: 0;");
                         });
 
                         break;
                     case 3:
                         gridCell.setFill(Color.web("#005500"));
-                        gridCell.setStyle("-fx-opacity: 1;");
+                        gridCell.setStyle("-fx-opacity: 0;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#007700"));
@@ -224,12 +231,12 @@ public class PathFinderGUI extends Application {
 
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#005500"));
-                            gridCell.setStyle("-fx-opacity: 1;");
+                            gridCell.setStyle("-fx-opacity: 0;");
                         });
                         break;
                     case 4:
                         gridCell.setFill(Color.web("#777777"));
-                        gridCell.setStyle("-fx-opacity: 1;");
+                        gridCell.setStyle("-fx-opacity: 0;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#999999"));
@@ -238,14 +245,14 @@ public class PathFinderGUI extends Application {
 
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#777777"));
-                            gridCell.setStyle("-fx-opacity: 1;");
+                            gridCell.setStyle("-fx-opacity: 0;");
                         });
                         break;
                     // Default case will be if the weight is 5 meaning a blocked node
                     default:
                         gridCellNode.setBlocked(true); // Node is initialized as a blocked node
                         gridCell.setFill(Color.web("#0000BB"));
-                        gridCell.setStyle("-fx-opacity: 1;");
+                        gridCell.setStyle("-fx-opacity: 0;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#0000FF"));
@@ -253,7 +260,7 @@ public class PathFinderGUI extends Application {
                         });
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#0000BB"));
-                            gridCell.setStyle("-fx-opacity: 1;");
+                            gridCell.setStyle("-fx-opacity: 0;");
                         });
                         break;
 

@@ -3,7 +3,6 @@ package lk.raneesh.pathfinder.controllers;
 import javafx.scene.control.Alert;
 import lk.raneesh.pathfinder.models.CellNode;
 import lk.raneesh.pathfinder.utility.GridWeight;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -17,7 +16,7 @@ public class PathFinderController {
     public static String distanceMetric;
     public static CellNode[][] gridNodes = new CellNode[GridWeight.getGridWeight().length][GridWeight.getGridWeight().length];
     public static PriorityQueue<CellNode> openNodes;
-    public static ArrayList<CellNode> path = new ArrayList<>();
+    public static ArrayList<CellNode> path;
 
     public static void runPathfinder() {
 
@@ -86,6 +85,7 @@ public class PathFinderController {
         if (gridNodes[endI][endJ].isVisited()) {
             // Build path
             CellNode currentNode = gridNodes[endI][endJ];
+            path = new ArrayList<>();
             path.add(currentNode);
 
             while (currentNode.getParentNode() != null) {
@@ -203,11 +203,16 @@ public class PathFinderController {
         // Check if the temporary node is already in the open nodes queue
         boolean isInOpen = openNodes.contains(tempNode);
 
-        // If the node is not present in the open nodes queue and also if the assigned final cost of the temporary node
-        // is greater than the calculated temporary final cost
-        if (!isInOpen || tempFinalCost < tempNode.getFinalCost()) {
-            // Update final cost of the neighbor node
-            tempNode.setFinalCost(tempFinalCost);
+        // If the node is present in the open nodes queue
+        if (isInOpen) {
+            if (tempgCost < tempNode.getgCost()) {
+                // Update gCost of the neighbor node
+                tempNode.setgCost(tempgCost);
+            }
+        }
+
+        // If the node is not present in the open nodes queue
+        if (!isInOpen) {
             // Update gCost of the neighbor node
             tempNode.setgCost(tempgCost);
             // Set the parent node of the neighbor node as the current node
@@ -217,6 +222,9 @@ public class PathFinderController {
                 openNodes.add(tempNode);
             }
         }
+
+        // Update final cost of the neighbor node
+        tempNode.setFinalCost(tempFinalCost);
     }
 
 }
