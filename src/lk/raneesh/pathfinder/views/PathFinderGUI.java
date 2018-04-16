@@ -5,8 +5,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -42,9 +42,11 @@ public class PathFinderGUI extends Application {
     private Button runBtn;
     private Button clearBtn;
 
+    private static boolean isStartNodeSelected = false;
+    private static int destinationNodeClickCount = 0;
+
     public static final int ROWS = 20;
     public static final int COLUMNS = 20;
-
 
     public static void main(String[] args) {
         launch(args);
@@ -72,6 +74,9 @@ public class PathFinderGUI extends Application {
     public void clearGrid(BorderPane borderPane) {
         clearBtn.setOnMouseClicked(event -> {
             borderPane.setCenter(generateLandscape());
+            isStartNodeSelected = false;
+            destinationNodeClickCount = 0;
+            costLabel.setText("0.0");
             PathFinderController.openNodes = null;
             PathFinderController.path = null;
         });
@@ -79,12 +84,13 @@ public class PathFinderGUI extends Application {
 
     public void getInput() {
         runBtn.setOnMouseClicked(event -> {
+            try {
             if (!sourceXInput.getText().equals("") && !sourceYInput.getText().equals("") && !destinationXInput.getText().equals("") && !destinationYInput.getText().equals("")) {
                 try {
                     if (Integer.parseInt(sourceXInput.getText()) >= 0 && Integer.parseInt(sourceXInput.getText()) <= (ROWS - 1)) {
                         PathFinderController.startI = Integer.parseInt(sourceXInput.getText());
                     } else {
-                        Alert sourceXAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
                         sourceXAlert.setTitle("Invalid Input Alert");
                         sourceXAlert.setContentText("Starting Point X Coordinate Out of Bounds!");
                         sourceXAlert.show();
@@ -92,7 +98,7 @@ public class PathFinderGUI extends Application {
                     if (Integer.parseInt(sourceYInput.getText()) >= 0 && Integer.parseInt(sourceYInput.getText()) <= (ROWS - 1)) {
                         PathFinderController.startJ = Integer.parseInt(sourceYInput.getText());
                     } else {
-                        Alert sourceYAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        Alert sourceYAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
                         sourceYAlert.setTitle("Invalid Input Alert");
                         sourceYAlert.setContentText("Starting Point Y Coordinate Out of Bounds!");
                         sourceYAlert.show();
@@ -100,7 +106,7 @@ public class PathFinderGUI extends Application {
                     if (Integer.parseInt(destinationXInput.getText()) >= 0 && Integer.parseInt(destinationXInput.getText()) <= (ROWS - 1)) {
                         PathFinderController.endI = Integer.parseInt(destinationXInput.getText());
                     } else {
-                        Alert destinationXAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        Alert destinationXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
                         destinationXAlert.setTitle("Invalid Input Alert");
                         destinationXAlert.setContentText("Ending Point X Coordinate Out of Bounds!");
                         destinationXAlert.show();
@@ -108,14 +114,14 @@ public class PathFinderGUI extends Application {
                     if (Integer.parseInt(destinationYInput.getText()) >= 0 && Integer.parseInt(destinationYInput.getText()) <= (ROWS - 1)) {
                         PathFinderController.endJ = Integer.parseInt(destinationYInput.getText());
                     } else {
-                        Alert destinationYAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                        Alert destinationYAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
                         destinationYAlert.setTitle("Invalid Input Alert");
                         destinationYAlert.setContentText("Ending Point Y Coordinate Out of Bounds!");
                         destinationYAlert.show();
                     }
                 }
                 catch(NumberFormatException ex) {
-                    Alert numberFormatAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                    Alert numberFormatAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
                     numberFormatAlert.setTitle("Invalid Input Alert");
                     numberFormatAlert.setContentText("Input is not a number! Please try again");
                     numberFormatAlert.show();
@@ -153,9 +159,12 @@ public class PathFinderGUI extends Application {
                 }
             }
             costLabel.setText(String.valueOf(PathFinderController.gridNodes[PathFinderController.endI][PathFinderController.endJ].getFinalCost()));
+
+            }
+            catch(NullPointerException ex) {
+                System.out.println("Path cannot be drawn!");
+            }
         });
-
-
     }
 
     public GridPane generateLandscape() {
@@ -164,7 +173,7 @@ public class PathFinderGUI extends Application {
         landscapeGrid.setMaxSize(800, 800);
         landscapeGrid.setStyle("-fx-background-color: #F4F4F4; -fx-background-image: url('images/landscape.PNG'); " +
                 "-fx-background-size: 710 640;");
-        landscapeGrid.setGridLinesVisible(true);
+        landscapeGrid.setGridLinesVisible(false);
 
         for (int i = 0 ; i < ROWS ; i++) {
             RowConstraints rowConstraints = new RowConstraints();
@@ -195,19 +204,19 @@ public class PathFinderGUI extends Application {
                 switch(gridCellArr[i][j]) {
                     case 1:
                         gridCell.setFill(Color.web("#00DD00"));
-                        gridCell.setStyle("-fx-opacity: 0;");
+                        gridCell.setStyle("-fx-opacity: 1;");
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#00FF00"));
                             gridCell.setStyle("-fx-opacity: 1;");
                         });
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#00DD00"));
-                            gridCell.setStyle("-fx-opacity: 0;");
+                            gridCell.setStyle("-fx-opacity: 1;");
                         });
                         break;
                     case 2:
                         gridCell.setFill(Color.web("#009900"));
-                        gridCell.setStyle("-fx-opacity: 0;");
+                        gridCell.setStyle("-fx-opacity: 1;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#00BB00"));
@@ -216,13 +225,13 @@ public class PathFinderGUI extends Application {
 
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#009900"));
-                            gridCell.setStyle("-fx-opacity: 0;");
+                            gridCell.setStyle("-fx-opacity: 1;");
                         });
 
                         break;
                     case 3:
                         gridCell.setFill(Color.web("#005500"));
-                        gridCell.setStyle("-fx-opacity: 0;");
+                        gridCell.setStyle("-fx-opacity: 1;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#007700"));
@@ -231,12 +240,12 @@ public class PathFinderGUI extends Application {
 
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#005500"));
-                            gridCell.setStyle("-fx-opacity: 0;");
+                            gridCell.setStyle("-fx-opacity: 1;");
                         });
                         break;
                     case 4:
                         gridCell.setFill(Color.web("#777777"));
-                        gridCell.setStyle("-fx-opacity: 0;");
+                        gridCell.setStyle("-fx-opacity: 1;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#999999"));
@@ -245,14 +254,14 @@ public class PathFinderGUI extends Application {
 
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#777777"));
-                            gridCell.setStyle("-fx-opacity: 0;");
+                            gridCell.setStyle("-fx-opacity: 1;");
                         });
                         break;
                     // Default case will be if the weight is 5 meaning a blocked node
                     default:
                         gridCellNode.setBlocked(true); // Node is initialized as a blocked node
                         gridCell.setFill(Color.web("#0000BB"));
-                        gridCell.setStyle("-fx-opacity: 0;");
+                        gridCell.setStyle("-fx-opacity: 1;");
 
                         gridCell.setOnMouseEntered(event -> {
                             gridCell.setFill(Color.web("#0000FF"));
@@ -260,13 +269,47 @@ public class PathFinderGUI extends Application {
                         });
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#0000BB"));
-                            gridCell.setStyle("-fx-opacity: 0;");
+                            gridCell.setStyle("-fx-opacity: 1;");
                         });
                         break;
 
                 }
 
                 landscapeGrid.add(gridCell, j, i);
+
+                gridCell.setOnMouseClicked(event -> {
+
+                    if (!isStartNodeSelected) {
+                        isStartNodeSelected = true;
+                        Node source = (Node)event.getSource() ;
+                        int column = GridPane.getColumnIndex(source);
+                        int row = GridPane.getRowIndex(source);
+                        Circle startNode = new Circle();
+                        startNode.setFill(Color.web("#FFFFFF"));
+                        startNode.setRadius(15.0f);
+                        startNode.setStyle("-fx-opacity: 1;");
+                        landscapeGrid.add(startNode, column, row);
+
+                        sourceXInput.setText(String.valueOf(row));
+                        sourceYInput.setText(String.valueOf(column));
+                    }
+                    else {
+                        if (destinationNodeClickCount == 0) {
+                            Node destination = (Node)event.getSource() ;
+                            int column = GridPane.getColumnIndex(destination);
+                            int row = GridPane.getRowIndex(destination);
+                            Circle endNode = new Circle();
+                            endNode.setFill(Color.web("#000000"));
+                            endNode.setRadius(15.0f);
+                            endNode.setStyle("-fx-opacity: 1;");
+                            landscapeGrid.add(endNode, column, row);
+                            destinationNodeClickCount++;
+
+                            destinationXInput.setText(String.valueOf(row));
+                            destinationYInput.setText(String.valueOf(column));
+                        }
+                    }
+                });
 
                 gridCell.widthProperty().bind(rectangleAreaSize.divide(18));
                 gridCell.heightProperty().bind(rectangleAreaSize.divide(21));
@@ -382,7 +425,7 @@ public class PathFinderGUI extends Application {
         costIdentifierLabel = new Text("TOTAL COST: ");
         controlGrid.add(costIdentifierLabel, 6, 9, 3, 3);
 
-        costLabel = new Text("0");
+        costLabel = new Text("0.0");
         controlGrid.add(costLabel, 8, 9, 8, 3);
 
         return controlGrid;

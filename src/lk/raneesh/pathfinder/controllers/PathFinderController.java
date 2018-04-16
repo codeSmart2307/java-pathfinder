@@ -51,14 +51,14 @@ public class PathFinderController {
                 //System.out.println(gridNodes[endI][endJ].getHeuristicCost());
             }
             else {
-                Alert sourceXAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+                Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
                 sourceXAlert.setTitle("Blocked Node Alert");
                 sourceXAlert.setContentText("Selected Ending Node is not viable as it is blocked!");
                 sourceXAlert.show();
             }
         }
         else {
-            Alert sourceXAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+            Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
             sourceXAlert.setTitle("Blocked Node Alert");
             sourceXAlert.setContentText("Selected Starting Node is not viable as it is blocked!");
             sourceXAlert.show();
@@ -103,14 +103,19 @@ public class PathFinderController {
         }
         else {
             // If the end node has not been reached and the path has been obstructed in the middle
-            Alert pathAbsentAlert = new Alert(Alert.AlertType.WARNING); //Alert popup of type "WARNING"
+            Alert pathAbsentAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
             pathAbsentAlert.setTitle("Path Not Found");
             pathAbsentAlert.setContentText("Path in " + distanceMetric + " distance metric not found!");
             pathAbsentAlert.show();
         }
 
-        for (int i = 0; i < path.size(); i++) {
-            System.out.println(path.get(i));
+        try {
+            for (int i = 0; i < path.size(); i++) {
+                System.out.println(path.get(i));
+            }
+        }
+        catch (NullPointerException ex) {
+            System.out.println("Path cannot be generated!");
         }
 
     }
@@ -122,72 +127,77 @@ public class PathFinderController {
         // CellNode object of the starting node
         CellNode currentNode;
 
-        // Traverse the grid till no more open nodes exist in the Priority Queue or destination has been reached
-        while(true) {
+        try {
+            // Traverse the grid till no more open nodes exist in the Priority Queue or destination has been reached
+            while (true) {
 
-            // Remove the current node from the Priority Queue and initialize it to the currentNode variable
-            currentNode = openNodes.poll();
+                // Remove the current node from the Priority Queue and initialize it to the currentNode variable
+                currentNode = openNodes.poll();
 
-            // Current node has been visited and is not visitable anymore
-            gridNodes[currentNode.getI()][currentNode.getJ()].setVisited(true);
+                // Current node has been visited and is not visitable anymore
+                gridNodes[currentNode.getI()][currentNode.getJ()].setVisited(true);
 
-            // If no more open nodes are available, stop the search
-            if (currentNode == null) {
-                break;
-            }
+                // If no more open nodes are available, stop the search
+                if (currentNode == null) {
+                    break;
+                }
 
-            // If the current node is the destination node, stop the search
-            if (currentNode.equals(gridNodes[endI][endJ])) {
-                return;
-            }
+                // If the current node is the destination node, stop the search
+                if (currentNode.equals(gridNodes[endI][endJ])) {
+                    return;
+                }
 
-            CellNode tempNeighborNode;
+                CellNode tempNeighborNode;
 
-            if (currentNode.getI() - 1 >= 0) {
-                // Node to the top of the current node
-                tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ()];
-                updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                if (currentNode.getI() - 1 >= 0) {
+                    // Node to the top of the current node
+                    tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ()];
+                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+
+                    if (currentNode.getJ() - 1 >= 0) {
+                        // Node to the top left of the current node
+                        tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ() - 1];
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    }
+                    if (currentNode.getJ() + 1 < gridNodes[0].length) {
+                        // Node to the top right of the current node
+                        tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ() + 1];
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    }
+                }
 
                 if (currentNode.getJ() - 1 >= 0) {
-                    // Node to the top left of the current node
-                    tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ() - 1];
+                    // Node to the left of the current node
+                    tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() - 1];
                     updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                 }
-                if (currentNode.getJ() + 1 < gridNodes[0].length) {
-                    // Node to the top right of the current node
-                    tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ() + 1];
+
+                if (currentNode.getJ() + 1 < gridNodes.length) {
+                    // Node to the right of the current node
+                    tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() + 1];
                     updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                 }
-            }
 
-            if (currentNode.getI() + 1 < gridNodes.length) {
-                // Node to the bottom of the current node
-                tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ()];
-                updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
-
-                if (currentNode.getJ() - 1 >= 0) {
-                    // Node to the bottom left of the current node
-                    tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ() - 1];
+                if (currentNode.getI() + 1 < gridNodes.length) {
+                    // Node to the bottom of the current node
+                    tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ()];
                     updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
-                }
-                if (currentNode.getJ() + 1 < gridNodes[0].length) {
-                    // Node to the bottom right of the current node
-                    tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ() + 1];
-                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
-                }
-            }
 
-            if (currentNode.getJ() - 1 >= 0) {
-                // Node to the left of the current node
-                tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() - 1];
-                updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    if (currentNode.getJ() - 1 >= 0) {
+                        // Node to the bottom left of the current node
+                        tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ() - 1];
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    }
+                    if (currentNode.getJ() + 1 < gridNodes[0].length) {
+                        // Node to the bottom right of the current node
+                        tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ() + 1];
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    }
+                }
             }
-
-            if (currentNode.getJ() + 1 < gridNodes.length) {
-                // Node to the right of the current node
-                tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() + 1];
-                updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
-            }
+        }
+        catch(NullPointerException ex) {
+            System.out.println("Path is blocked!");
         }
     }
 
@@ -203,28 +213,32 @@ public class PathFinderController {
         // Check if the temporary node is already in the open nodes queue
         boolean isInOpen = openNodes.contains(tempNode);
 
+        // Check if the parent node is assigned to the node with the optimal gCost in the queue or a
+        // new node not in the queue
+        boolean isPath = false;
+
         // If the node is present in the open nodes queue
         if (isInOpen) {
             if (tempgCost < tempNode.getgCost()) {
                 // Update gCost of the neighbor node
                 tempNode.setgCost(tempgCost);
+                isPath = true;
             }
         }
-
         // If the node is not present in the open nodes queue
-        if (!isInOpen) {
+        else {
             // Update gCost of the neighbor node
             tempNode.setgCost(tempgCost);
-            // Set the parent node of the neighbor node as the current node
-            tempNode.setParentNode(currentNode);
             // If the neighbor node is not already in the open nodes queue add it in
-            if (!isInOpen) {
-                openNodes.add(tempNode);
-            }
+            openNodes.add(tempNode);
+            isPath = true;
         }
 
-        // Update final cost of the neighbor node
-        tempNode.setFinalCost(tempFinalCost);
+        if (isPath) {
+            // Update final cost of the neighbor node
+            tempNode.setFinalCost(tempFinalCost);
+            // Set the parent node of the neighbor node as the current node
+            tempNode.setParentNode(currentNode);
+        }
     }
-
 }
