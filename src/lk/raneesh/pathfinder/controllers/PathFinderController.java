@@ -217,32 +217,27 @@ public class PathFinderController {
         // Check if the temporary node is already in the open nodes queue
         boolean isInOpen = openNodes.contains(tempNode);
 
-        // Check if the parent node is assigned to the node with the optimal gCost in the queue or a
-        // new node not in the queue
-        boolean isPath = false;
-
         // If the node is present in the open nodes queue
         if (isInOpen) {
             if (tempgCost < tempNode.getgCost()) {
                 // Update gCost of the neighbor node
                 tempNode.setgCost(tempgCost);
-                isPath = true;
+                // Update final cost of the neighbor node
+                tempNode.setFinalCost(tempFinalCost);
+                // Set the parent node of the neighbor node as the current node
+                tempNode.setParentNode(currentNode);
             }
         }
         // If the node is not present in the open nodes queue
         else {
             // Update gCost of the neighbor node
             tempNode.setgCost(tempgCost);
-            // If the neighbor node is not already in the open nodes queue add it in
-            openNodes.add(tempNode);
-            isPath = true;
-        }
-
-        if (isPath) {
             // Update final cost of the neighbor node
             tempNode.setFinalCost(tempFinalCost);
             // Set the parent node of the neighbor node as the current node
             tempNode.setParentNode(currentNode);
+            // If the neighbor node is not already in the open nodes queue add it in
+            openNodes.add(tempNode);
         }
     }
 }
