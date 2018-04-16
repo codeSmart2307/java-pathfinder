@@ -51,17 +51,19 @@ public class PathFinderController {
                 //System.out.println(gridNodes[endI][endJ].getHeuristicCost());
             }
             else {
-                Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
+                Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "ERROR"
                 sourceXAlert.setTitle("Blocked Node Alert");
                 sourceXAlert.setContentText("Selected Ending Node is not viable as it is blocked!");
                 sourceXAlert.show();
+                return;
             }
         }
         else {
-            Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
+            Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "ERROR"
             sourceXAlert.setTitle("Blocked Node Alert");
             sourceXAlert.setContentText("Selected Starting Node is not viable as it is blocked!");
             sourceXAlert.show();
+            return;
         }
 
         openNodes = new PriorityQueue<>(new Comparator<CellNode>() {
@@ -71,10 +73,9 @@ public class PathFinderController {
                     return -1;
                 } else if (cellNode1.getFinalCost() > cellNode2.getFinalCost()) {
                     return 1;
-                } else {
-                    // If both final costs are equal then then FIFO is implemented
-                    return 0;
                 }
+                // If both final costs are equal then then FIFO is implemented
+                return 0;
             }
         });
 
@@ -109,14 +110,14 @@ public class PathFinderController {
             pathAbsentAlert.show();
         }
 
-        try {
-            for (int i = 0; i < path.size(); i++) {
-                System.out.println(path.get(i));
-            }
-        }
-        catch (NullPointerException ex) {
-            System.out.println("Path cannot be generated!");
-        }
+//        try {
+//            for (int i = 0; i < path.size(); i++) {
+//                System.out.println(path.get(i));
+//            }
+//        }
+//        catch (NullPointerException ex) {
+//            System.out.println("Path cannot be generated!");
+//        }
 
     }
 
@@ -130,9 +131,12 @@ public class PathFinderController {
         try {
             // Traverse the grid till no more open nodes exist in the Priority Queue or destination has been reached
             while (true) {
-
+//                for (CellNode node: openNodes) {
+//                    System.out.println(node);
+//                }
+//                System.out.println("==================================================================================");
                 // Remove the current node from the Priority Queue and initialize it to the currentNode variable
-                currentNode = openNodes.poll();
+                currentNode = openNodes.remove();
 
                 // Current node has been visited and is not visitable anymore
                 gridNodes[currentNode.getI()][currentNode.getJ()].setVisited(true);

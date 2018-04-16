@@ -22,6 +22,8 @@ import lk.raneesh.pathfinder.controllers.PathFinderController;
 import lk.raneesh.pathfinder.models.CellNode;
 import lk.raneesh.pathfinder.utility.GridWeight;
 
+import edu.princeton.cs.introcs.Stopwatch;
+
 public class PathFinderGUI extends Application {
 
     private GridPane landscapeGrid;
@@ -59,7 +61,10 @@ public class PathFinderGUI extends Application {
         primaryBorderPane.setPrefSize(800, 800);
 
         primaryBorderPane.setTop(generateControls());
+
+        Stopwatch gridGenerateTime = new Stopwatch();
         primaryBorderPane.setCenter(generateLandscape());
+        System.out.println("Grid Generation | Time Elapsed: " + gridGenerateTime.elapsedTime() + " seconds");
 
         Scene scene = new Scene(primaryBorderPane, 800, 1000);
         primaryStage.setScene(scene);
@@ -84,6 +89,7 @@ public class PathFinderGUI extends Application {
 
     public void getInput() {
         runBtn.setOnMouseClicked(event -> {
+            Stopwatch totalTime = new Stopwatch();
             try {
             if (!sourceXInput.getText().equals("") && !sourceYInput.getText().equals("") && !destinationXInput.getText().equals("") && !destinationYInput.getText().equals("")) {
                 try {
@@ -144,6 +150,7 @@ public class PathFinderGUI extends Application {
 
             int[][] gridCellArr = GridWeight.getGridWeight();
 
+            Stopwatch drawTime = new Stopwatch();
             for (int i = 0; i < gridCellArr.length; i++) {
                 for (int j = 0; j < gridCellArr.length; j++) {
                     for (int k = 0; k < PathFinderController.path.size(); k++) {
@@ -158,12 +165,15 @@ public class PathFinderGUI extends Application {
                     }
                 }
             }
+            System.out.println("Path Drawing | Time Elapsed: " + drawTime.elapsedTime() + " seconds");
             costLabel.setText(String.valueOf(PathFinderController.gridNodes[PathFinderController.endI][PathFinderController.endJ].getFinalCost()));
 
             }
             catch(NullPointerException ex) {
                 System.out.println("Path cannot be drawn!");
             }
+
+            System.out.println("Total Time Elapsed: " + totalTime.elapsedTime() + " seconds");
         });
     }
 
