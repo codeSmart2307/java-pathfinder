@@ -3,6 +3,8 @@ package lk.raneesh.pathfinder.controllers;
 import javafx.scene.control.Alert;
 import lk.raneesh.pathfinder.models.CellNode;
 import lk.raneesh.pathfinder.utility.GridWeight;
+import lk.raneesh.pathfinder.views.PathFinderGUI;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -14,7 +16,7 @@ public class PathFinderController {
     public static int endI;
     public static int endJ;
     public static String distanceMetric;
-    public static CellNode[][] gridNodes = new CellNode[GridWeight.getGridWeight().length][GridWeight.getGridWeight().length];
+    public static CellNode[][] gridNodes = new CellNode[PathFinderGUI.getRows()][PathFinderGUI.getColumns()];
     public static PriorityQueue<CellNode> openNodes;
     public static ArrayList<CellNode> path;
 
@@ -96,11 +98,6 @@ public class PathFinderController {
                 // Ready for next parent node
                 currentNode = currentNode.getParentNode();
             }
-
-            Alert pathFoundAlert = new Alert(Alert.AlertType.INFORMATION); //Alert popup of type "WARNING"
-            pathFoundAlert.setTitle("Path Found");
-            pathFoundAlert.setContentText("Path in " + distanceMetric + " distance metric found!");
-            pathFoundAlert.show();
         }
         else {
             // If the end node has not been reached and the path has been obstructed in the middle
@@ -148,50 +145,57 @@ public class PathFinderController {
                 }
 
                 CellNode tempNeighborNode;
+                int[][] tempCellArray = GridWeight.getGridWeight();
+                if (PathFinderGUI.getRows() == 40) {
+                    tempCellArray = GridWeight.getDoubledGridWeight();
+                }
+                else if (PathFinderGUI.getRows() == 80) {
+                    tempCellArray = GridWeight.getQuadrupledGridWeight();
+                }
 
                 if (currentNode.getI() - 1 >= 0) {
                     // Node to the top of the current node
                     tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ()];
-                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
 
                     if (currentNode.getJ() - 1 >= 0) {
                         // Node to the top left of the current node
                         tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ() - 1];
-                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                     }
                     if (currentNode.getJ() + 1 < gridNodes[0].length) {
                         // Node to the top right of the current node
                         tempNeighborNode = gridNodes[currentNode.getI() - 1][currentNode.getJ() + 1];
-                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                     }
                 }
 
                 if (currentNode.getJ() - 1 >= 0) {
                     // Node to the left of the current node
                     tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() - 1];
-                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                 }
 
                 if (currentNode.getJ() + 1 < gridNodes.length) {
                     // Node to the right of the current node
                     tempNeighborNode = gridNodes[currentNode.getI()][currentNode.getJ() + 1];
-                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                 }
 
                 if (currentNode.getI() + 1 < gridNodes.length) {
                     // Node to the bottom of the current node
                     tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ()];
-                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                    updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
 
                     if (currentNode.getJ() - 1 >= 0) {
                         // Node to the bottom left of the current node
                         tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ() - 1];
-                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                     }
                     if (currentNode.getJ() + 1 < gridNodes[0].length) {
                         // Node to the bottom right of the current node
                         tempNeighborNode = gridNodes[currentNode.getI() + 1][currentNode.getJ() + 1];
-                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + GridWeight.getGridWeight()[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
+                        updateFinalCost(currentNode, tempNeighborNode, currentNode.getgCost() + tempCellArray[tempNeighborNode.getI()][tempNeighborNode.getJ()]);
                     }
                 }
             }
