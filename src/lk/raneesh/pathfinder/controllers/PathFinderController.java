@@ -21,91 +21,86 @@ public class PathFinderController {
     public static ArrayList<CellNode> path;
 
     public static void runPathfinder() {
+        try {
+            if (!gridNodes[startI][startJ].isBlocked()) {
+                if (!gridNodes[endI][endJ].isBlocked()) {
+                    // Set starting node's gCost to 0
+                    gridNodes[startI][startJ].setgCost(0);
+                    // Starting node's parent doesn't exist since the path starts there
+                    gridNodes[startI][startJ].setParentNode(null);
 
-        if (!gridNodes[startI][startJ].isBlocked()) {
-            if (!gridNodes[endI][endJ].isBlocked()) {
-                // Set starting node's gCost to 0
-                gridNodes[startI][startJ].setgCost(0);
-                // Starting node's parent doesn't exist since the path starts there
-                gridNodes[startI][startJ].setParentNode(null);
-
-                // Traverse though nodes in grid and assign heuristic and final cost
-                for (int i = 0; i < gridNodes.length; i++) {
-                    for (int j = 0; j < gridNodes.length; j++) {
-                        // Calculate heuristic cost for all nodes in the grid based on the chosen distance metric and end node
-                        if (distanceMetric.equals("Manhattan")) {
-                            double heuristicCost = Math.abs(i - endI) + Math.abs(j - endJ);
-                            gridNodes[i][j].setHeuristicCost(heuristicCost);
-                            gridNodes[i][j].setFinalCost(gridNodes[i][j].getgCost() + gridNodes[i][j].getHeuristicCost());
-                        }
-                        else if (distanceMetric.equals("Euclidean")) {
-                            double heuristicCost = Math.sqrt(Math.pow((i - endI), 2) + Math.pow((j - endJ), 2));
-                            gridNodes[i][j].setHeuristicCost(heuristicCost);
-                            gridNodes[i][j].setFinalCost(gridNodes[i][j].getgCost() + gridNodes[i][j].getHeuristicCost());
-                        }
-                        else if (distanceMetric.equals("Chebyshev")) {
-                            int heuristicCost = Math.max(Math.abs(i - endI), Math.abs(j - endJ));
-                            gridNodes[i][j].setHeuristicCost(heuristicCost);
-                            gridNodes[i][j].setFinalCost(gridNodes[i][j].getgCost() + gridNodes[i][j].getHeuristicCost());
+                    // Traverse though nodes in grid and assign heuristic and final cost
+                    for (int i = 0; i < gridNodes.length; i++) {
+                        for (int j = 0; j < gridNodes.length; j++) {
+                            // Calculate heuristic cost for all nodes in the grid based on the chosen distance metric and end node
+                            if (distanceMetric.equals("Manhattan")) {
+                                double heuristicCost = Math.abs(i - endI) + Math.abs(j - endJ);
+                                gridNodes[i][j].setHeuristicCost(heuristicCost);
+                                gridNodes[i][j].setFinalCost(gridNodes[i][j].getgCost() + gridNodes[i][j].getHeuristicCost());
+                            } else if (distanceMetric.equals("Euclidean")) {
+                                double heuristicCost = Math.sqrt(Math.pow((i - endI), 2) + Math.pow((j - endJ), 2));
+                                gridNodes[i][j].setHeuristicCost(heuristicCost);
+                                gridNodes[i][j].setFinalCost(gridNodes[i][j].getgCost() + gridNodes[i][j].getHeuristicCost());
+                            } else if (distanceMetric.equals("Chebyshev")) {
+                                int heuristicCost = Math.max(Math.abs(i - endI), Math.abs(j - endJ));
+                                gridNodes[i][j].setHeuristicCost(heuristicCost);
+                                gridNodes[i][j].setFinalCost(gridNodes[i][j].getgCost() + gridNodes[i][j].getHeuristicCost());
+                            }
                         }
                     }
+                    //System.out.println(gridNodes[endI][endJ].getHeuristicCost());
+                } else {
+                    Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "ERROR"
+                    sourceXAlert.setTitle("Blocked Node Alert");
+                    sourceXAlert.setContentText("Selected Ending Node is not viable as it is blocked!");
+                    sourceXAlert.show();
+                    return;
                 }
-                //System.out.println(gridNodes[endI][endJ].getHeuristicCost());
-            }
-            else {
+            } else {
                 Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "ERROR"
                 sourceXAlert.setTitle("Blocked Node Alert");
-                sourceXAlert.setContentText("Selected Ending Node is not viable as it is blocked!");
+                sourceXAlert.setContentText("Selected Starting Node is not viable as it is blocked!");
                 sourceXAlert.show();
                 return;
             }
-        }
-        else {
-            Alert sourceXAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "ERROR"
-            sourceXAlert.setTitle("Blocked Node Alert");
-            sourceXAlert.setContentText("Selected Starting Node is not viable as it is blocked!");
-            sourceXAlert.show();
-            return;
-        }
 
-        openNodes = new PriorityQueue<>(new Comparator<CellNode>() {
-            @Override
-            public int compare(CellNode cellNode1, CellNode cellNode2) {
-                if (cellNode1.getFinalCost() < cellNode2.getFinalCost()) {
-                    return -1;
-                } else if (cellNode1.getFinalCost() > cellNode2.getFinalCost()) {
-                    return 1;
+            openNodes = new PriorityQueue<>(new Comparator<CellNode>() {
+                @Override
+                public int compare(CellNode cellNode1, CellNode cellNode2) {
+                    if (cellNode1.getFinalCost() < cellNode2.getFinalCost()) {
+                        return -1;
+                    } else if (cellNode1.getFinalCost() > cellNode2.getFinalCost()) {
+                        return 1;
+                    }
+                    // If both final costs are equal then then FIFO is implemented
+                    return 0;
                 }
-                // If both final costs are equal then then FIFO is implemented
-                return 0;
+            });
+
+            // Runs search on the grid
+            travelGrid();
+
+            // If the ending node has been visited
+            if (gridNodes[endI][endJ].isVisited()) {
+                // Build path
+                CellNode currentNode = gridNodes[endI][endJ];
+                path = new ArrayList<>();
+                path.add(currentNode);
+
+                while (currentNode.getParentNode() != null) {
+                    // Add parent node to the path
+                    path.add(currentNode.getParentNode());
+
+                    // Ready for next parent node
+                    currentNode = currentNode.getParentNode();
+                }
+            } else {
+                // If the end node has not been reached and the path has been obstructed in the middle
+                Alert pathAbsentAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
+                pathAbsentAlert.setTitle("Path Not Found");
+                pathAbsentAlert.setContentText("Path in " + distanceMetric + " distance metric not found!");
+                pathAbsentAlert.show();
             }
-        });
-
-        // Runs search on the grid
-        travelGrid();
-
-        // If the ending node has been visited
-        if (gridNodes[endI][endJ].isVisited()) {
-            // Build path
-            CellNode currentNode = gridNodes[endI][endJ];
-            path = new ArrayList<>();
-            path.add(currentNode);
-
-            while (currentNode.getParentNode() != null) {
-                // Add parent node to the path
-                path.add(currentNode.getParentNode());
-
-                // Ready for next parent node
-                currentNode = currentNode.getParentNode();
-            }
-        }
-        else {
-            // If the end node has not been reached and the path has been obstructed in the middle
-            Alert pathAbsentAlert = new Alert(Alert.AlertType.ERROR); //Alert popup of type "WARNING"
-            pathAbsentAlert.setTitle("Path Not Found");
-            pathAbsentAlert.setContentText("Path in " + distanceMetric + " distance metric not found!");
-            pathAbsentAlert.show();
-        }
 
 //        try {
 //            for (int i = 0; i < path.size(); i++) {
@@ -115,6 +110,9 @@ public class PathFinderController {
 //        catch (NullPointerException ex) {
 //            System.out.println("Path cannot be generated!");
 //        }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println("Please fill out all the fields!");
+        }
 
     }
 
@@ -148,8 +146,7 @@ public class PathFinderController {
                 int[][] tempCellArray = GridWeight.getGridWeight();
                 if (PathFinderGUI.getRows() == 40) {
                     tempCellArray = GridWeight.getDoubledGridWeight();
-                }
-                else if (PathFinderGUI.getRows() == 80) {
+                } else if (PathFinderGUI.getRows() == 80) {
                     tempCellArray = GridWeight.getQuadrupledGridWeight();
                 }
 
@@ -199,8 +196,7 @@ public class PathFinderController {
                     }
                 }
             }
-        }
-        catch(NullPointerException ex) {
+        } catch (NullPointerException ex) {
             System.out.println("Path is blocked!");
         }
     }

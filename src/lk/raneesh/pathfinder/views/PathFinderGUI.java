@@ -27,12 +27,7 @@ import edu.princeton.cs.introcs.Stopwatch;
 public class PathFinderGUI extends Application {
 
     private GridPane landscapeGrid;
-    private GridPane controlGrid;
 
-    private Text sourceCoordinates;
-    private Text destinationCoordinates;
-    private Text costIdentifierLabel;
-    private Text timeIdentifierLabel;
     private Text costLabel;
     private Text timeLabel;
     private TextField sourceXInput;
@@ -40,13 +35,12 @@ public class PathFinderGUI extends Application {
     private TextField destinationXInput;
     private TextField destinationYInput;
     private ToggleGroup heuristicGroup;
-    private RadioButton manhattanBtn;
-    private RadioButton euclideanBtn;
-    private RadioButton chebyshevBtn;
+    private Button clearFieldsBtn;
     private Button runBtn;
-    private Button clearBtn;
+    private Button clearPathBtn;
     private Button doubleBtn;
     private Button quadrupleBtn;
+    private Button defaultGridBtn;
 
     private static boolean isStartNodeSelected = false;
     private static int destinationNodeClickCount = 0;
@@ -60,16 +54,8 @@ public class PathFinderGUI extends Application {
         return rows;
     }
 
-    public static void setRows(int rows) {
-        PathFinderGUI.rows = rows;
-    }
-
     public static int getColumns() {
         return columns;
-    }
-
-    public static void setColumns(int columns) {
-        PathFinderGUI.columns = columns;
     }
 
     public static void main(String[] args) {
@@ -95,25 +81,27 @@ public class PathFinderGUI extends Application {
         primaryStage.show();
 
         getInput(primaryBorderPane);
-        clearGrid(primaryBorderPane);
     }
 
-    public void clearGrid(BorderPane borderPane) {
-        clearBtn.setOnMouseClicked(event -> {
+    public void getInput(BorderPane borderPane) {
+        clearFieldsBtn.setOnMouseClicked(event -> {
+            sourceXInput.setText("");
+            sourceYInput.setText("");
+            destinationXInput.setText("");
+            destinationYInput.setText("");
+            PathFinderController.startI = -1;
+            PathFinderController.startJ = -1;
+            PathFinderController.endI = -1;
+            PathFinderController.endJ = -1;
+
+        });
+        defaultGridBtn.setOnMouseClicked(event -> {
             rows = 20;
             columns = 20;
             isGridDouble = false;
             isGridQuadruple = false;
             borderPane.setCenter(generateLandscape());
-            isStartNodeSelected = false;
-            destinationNodeClickCount = 0;
-            costLabel.setText("0.0");
-            PathFinderController.openNodes = null;
-            PathFinderController.path = null;
         });
-    }
-
-    public void getInput(BorderPane borderPane) {
         doubleBtn.setOnMouseClicked(event -> {
             rows = 40;
             columns = 40;
@@ -139,6 +127,14 @@ public class PathFinderGUI extends Application {
             PathFinderController.path = null;
             PathFinderController.gridNodes = new CellNode[rows][columns];
             borderPane.setCenter(generateLandscape());
+        });
+        clearPathBtn.setOnMouseClicked(event -> {
+            borderPane.setCenter(generateLandscape());
+            isStartNodeSelected = false;
+            destinationNodeClickCount = 0;
+            costLabel.setText("0.0");
+            PathFinderController.openNodes = null;
+            PathFinderController.path = null;
         });
         runBtn.setOnMouseClicked(event -> {
             Stopwatch totalTime = new Stopwatch();
@@ -206,36 +202,29 @@ public class PathFinderGUI extends Application {
 
                 if (isGridDouble && !isGridQuadruple) {
                     gridCellArr = GridWeight.getDoubledGridWeight();
-                }
-                else if (isGridQuadruple && !isGridDouble) {
+                } else if (isGridQuadruple && !isGridDouble) {
                     gridCellArr = GridWeight.getQuadrupledGridWeight();
                 }
 
                 Stopwatch drawTime = new Stopwatch();
-                for (int i = 0; i < gridCellArr.length; i++) {
-                    for (int j = 0; j < gridCellArr.length; j++) {
-                        for (int k = 0; k < PathFinderController.path.size(); k++) {
-                            if (PathFinderController.path.get(k).getI() == i && PathFinderController.path.get(k).getJ() == j) {
-                                Circle pathCircle = new Circle();
-                                pathCircle.setFill(Color.web("#FF0000"));
-                                pathCircle.setRadius(15.0f);
-                                if (isGridDouble && !isGridQuadruple) {
-                                    pathCircle.setRadius(6.0f);
-                                }
-                                if (isGridQuadruple && !isGridDouble) {
-                                    pathCircle.setRadius(2.0f);
-                                }
-                                pathCircle.setStyle("-fx-opacity: 1;");
-                                landscapeGrid.add(pathCircle, j, i);
-                                break;
-                            }
-                        }
+                for (int k = 0; k < PathFinderController.path.size(); k++) {
+                    Circle pathCircle = new Circle();
+                    pathCircle.setFill(Color.web("#FF0000"));
+                    pathCircle.setRadius(15.0f);
+                    if (isGridDouble && !isGridQuadruple) {
+                        pathCircle.setRadius(6.0f);
                     }
+                    if (isGridQuadruple && !isGridDouble) {
+                        pathCircle.setRadius(2.0f);
+                    }
+                    pathCircle.setStyle("-fx-opacity: 1;");
+                    landscapeGrid.add(pathCircle, PathFinderController.path.get(k).getJ(), PathFinderController.path.get(k).getI());
                 }
+
                 System.out.println("Path Drawing | Time Elapsed: " + drawTime.elapsedTime() + " seconds");
                 costLabel.setText(String.valueOf(PathFinderController.gridNodes[PathFinderController.endI][PathFinderController.endJ].getFinalCost()));
 
-            } catch (NullPointerException ex) {
+            } catch (NullPointerException | ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Path cannot be drawn!");
             }
 
@@ -273,8 +262,7 @@ public class PathFinderGUI extends Application {
 
         if (isGridDouble && !isGridQuadruple) {
             gridCellArr = GridWeight.getDoubledGridWeight();
-        }
-        else if (isGridQuadruple && !isGridDouble) {
+        } else if (isGridQuadruple && !isGridDouble) {
             gridCellArr = GridWeight.getQuadrupledGridWeight();
         }
 
@@ -307,7 +295,6 @@ public class PathFinderGUI extends Application {
                             gridCell.setFill(Color.web("#00BB00"));
                             gridCell.setStyle("-fx-opacity: 1;");
                         });
-
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#009900"));
                             gridCell.setStyle("-fx-opacity: 0;");
@@ -322,7 +309,6 @@ public class PathFinderGUI extends Application {
                             gridCell.setFill(Color.web("#007700"));
                             gridCell.setStyle("-fx-opacity: 1;");
                         });
-
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#005500"));
                             gridCell.setStyle("-fx-opacity: 0;");
@@ -336,7 +322,6 @@ public class PathFinderGUI extends Application {
                             gridCell.setFill(Color.web("#999999"));
                             gridCell.setStyle("-fx-opacity: 1;");
                         });
-
                         gridCell.setOnMouseExited(event -> {
                             gridCell.setFill(Color.web("#777777"));
                             gridCell.setStyle("-fx-opacity: 0;");
@@ -413,8 +398,7 @@ public class PathFinderGUI extends Application {
                 if (isGridDouble && !isGridQuadruple) {
                     gridCell.widthProperty().bind(rectangleAreaSize.divide(50));
                     gridCell.heightProperty().bind(rectangleAreaSize.divide(50));
-                }
-                else if (isGridQuadruple && !isGridDouble) {
+                } else if (isGridQuadruple && !isGridDouble) {
                     gridCell.widthProperty().bind(rectangleAreaSize.divide(400));
                     gridCell.heightProperty().bind(rectangleAreaSize.divide(600));
                 }
@@ -425,9 +409,10 @@ public class PathFinderGUI extends Application {
     }
 
     public GridPane generateControls() {
-        controlGrid = new GridPane();
+        GridPane controlGrid = new GridPane();
         controlGrid.setPadding(new Insets(10, 10, 10, 25));
         controlGrid.setPrefSize(300, 300);
+        controlGrid.setGridLinesVisible(false);
         controlGrid.setVgap(10);
         controlGrid.setHgap(15);
 
@@ -448,62 +433,90 @@ public class PathFinderGUI extends Application {
         }
 
         //Header for the Source Coordinates
-        sourceCoordinates = new Text("Start");
+        Text sourceCoordinates = new Text("Start");
         sourceCoordinates.setFont(Font.font("Tahoma", FontWeight.BOLD, 14));
-        controlGrid.add(sourceCoordinates, 3, 0, 3, 1);
+        controlGrid.add(sourceCoordinates, 4, 0, 3, 1);
 
         //Input Field for the Source X Coordinate
         sourceXInput = new TextField();
         sourceXInput.setPromptText("X"); //Setting a placeholder for the field
         sourceXInput.setPrefWidth(30);
-        controlGrid.add(sourceXInput, 3, 1, 2, 1);
+        controlGrid.add(sourceXInput, 4, 1, 2, 1);
 
         //Input Field for the Source Y Coordinate
         sourceYInput = new TextField();
         sourceYInput.setPromptText("Y"); //Setting a placeholder for the field
         sourceYInput.setPrefWidth(30);
-        controlGrid.add(sourceYInput, 5, 1, 2, 1);
+        controlGrid.add(sourceYInput, 6, 1, 2, 1);
 
         //Header for the Destination Coordinates
-        destinationCoordinates = new Text("End");
+        Text destinationCoordinates = new Text("End");
         destinationCoordinates.setFont(Font.font("Tahoma", FontWeight.BOLD, 14));
-        controlGrid.add(destinationCoordinates, 8, 0, 3, 1);
+        controlGrid.add(destinationCoordinates, 9, 0, 3, 1);
 
         //Input Field for the Destination X Coordinate
         destinationXInput = new TextField();
         destinationXInput.setPromptText("X"); //Setting a placeholder for the field
         destinationXInput.setPrefWidth(30);
-        controlGrid.add(destinationXInput, 8, 1, 2, 1);
+        controlGrid.add(destinationXInput, 9, 1, 2, 1);
 
         //Input Field for the Destination Y Coordinate
         destinationYInput = new TextField();
         destinationYInput.setPromptText("Y"); //Setting a placeholder for the field
         destinationYInput.setPrefWidth(30);
-        controlGrid.add(destinationYInput, 10, 1, 2, 1);
+        controlGrid.add(destinationYInput, 11, 1, 2, 1);
+
+        //Clear button to clear fields
+        clearFieldsBtn = new Button("CLEAR FIELDS");
+        clearFieldsBtn.setMaxSize(110, 20);
+        clearFieldsBtn.setStyle("-fx-background-color: #999999; -fx-background-radius: 14; -fx-text-fill: white;");
+        controlGrid.add(clearFieldsBtn, 14, 1, 10, 1);
+
+        //Defining mouse hover events for clear button
+        clearFieldsBtn.setOnMouseEntered(event -> {
+            clearFieldsBtn.setStyle("-fx-background-color: #CCCCCC; -fx-background-radius: 14; -fx-text-fill: white;");
+        });
+        clearFieldsBtn.setOnMouseExited(event -> {
+            clearFieldsBtn.setStyle("-fx-background-color: #999999; -fx-background-radius: 14; -fx-text-fill: white;");
+        });
 
         heuristicGroup = new ToggleGroup(); //Define Group for Radio Buttons for Heuristics
 
         //Radio Button for the Manhattan Distance Metric
-        manhattanBtn = new RadioButton("Manhattan");
+        RadioButton manhattanBtn = new RadioButton("Manhattan");
         manhattanBtn.setToggleGroup(heuristicGroup);
         manhattanBtn.setSelected(true);
-        controlGrid.add(manhattanBtn, 2, 4, 3, 1);
+        controlGrid.add(manhattanBtn, 3, 4, 3, 1);
 
         //Radio Button for the Euclidean Distance Metric
-        euclideanBtn = new RadioButton("Euclidean");
+        RadioButton euclideanBtn = new RadioButton("Euclidean");
         euclideanBtn.setToggleGroup(heuristicGroup);
-        controlGrid.add(euclideanBtn, 6, 4, 3, 1);
+        controlGrid.add(euclideanBtn, 7, 4, 3, 1);
 
         //Radio Button for the Chebyshev Distance Metric
-        chebyshevBtn = new RadioButton("Chebyshev");
+        RadioButton chebyshevBtn = new RadioButton("Chebyshev");
         chebyshevBtn.setToggleGroup(heuristicGroup);
-        controlGrid.add(chebyshevBtn, 10, 4, 3, 1);
+        controlGrid.add(chebyshevBtn, 11, 4, 3, 1);
+
+        //Default button to default grid size
+        defaultGridBtn = new Button("DEFAULT GRID");
+        defaultGridBtn.setMaxSize(120, 30);
+        defaultGridBtn.setStyle("-fx-background-color: #000099; -fx-background-radius: 14; -fx-text-fill: white;");
+        controlGrid.add(defaultGridBtn, 1, 6, 14, 3);
+
+        //Defining mouse hover events for clear button
+        defaultGridBtn.setOnMouseEntered(event -> {
+            defaultGridBtn.setStyle("-fx-background-color: #0000BB; -fx-background-radius: 14; -fx-text-fill: white;");
+        });
+        defaultGridBtn.setOnMouseExited(event -> {
+            defaultGridBtn.setStyle("-fx-background-color: #000099; -fx-background-radius: 14; -fx-text-fill: white;");
+        });
 
         //Run button to generate shortest path based on a selected heuristic
         runBtn = new Button("RUN");
-        runBtn.setMaxSize(90, 50);
+        runBtn.setMaxSize(110, 40);
         runBtn.setStyle("-fx-background-color: #009432; -fx-background-radius: 14;");
-        controlGrid.add(runBtn, 5, 6, 8, 3);
+        controlGrid.add(runBtn, 5, 6, 5, 3);
 
         //Defining mouse hover events for run button
         runBtn.setOnMouseEntered(event -> {
@@ -514,24 +527,24 @@ public class PathFinderGUI extends Application {
         });
 
         //Clear button to clear any generated paths
-        clearBtn = new Button("CLEAR");
-        clearBtn.setMaxSize(90, 50);
-        clearBtn.setStyle("-fx-background-color: #EA2027; -fx-background-radius: 14;");
-        controlGrid.add(clearBtn, 7, 6, 8, 3);
+        clearPathBtn = new Button("CLEAR PATH");
+        clearPathBtn.setMaxSize(110, 40);
+        clearPathBtn.setStyle("-fx-background-color: #EA2027; -fx-background-radius: 14;");
+        controlGrid.add(clearPathBtn, 8, 6, 5, 3);
 
         //Defining mouse hover events for clear button
-        clearBtn.setOnMouseEntered(event -> {
-            clearBtn.setStyle("-fx-background-color: #ff4d4d; -fx-background-radius: 14;");
+        clearPathBtn.setOnMouseEntered(event -> {
+            clearPathBtn.setStyle("-fx-background-color: #ff4d4d; -fx-background-radius: 14;");
         });
-        clearBtn.setOnMouseExited(event -> {
-            clearBtn.setStyle("-fx-background-color: #EA2027; -fx-background-radius: 14;");
+        clearPathBtn.setOnMouseExited(event -> {
+            clearPathBtn.setStyle("-fx-background-color: #EA2027; -fx-background-radius: 14;");
         });
 
         //Double button to double grid size
         doubleBtn = new Button("GRID x2");
-        doubleBtn.setMaxSize(90, 50);
+        doubleBtn.setMaxSize(90, 30);
         doubleBtn.setStyle("-fx-background-color: #000099; -fx-background-radius: 14; -fx-text-fill: white;");
-        controlGrid.add(doubleBtn, 10, 6, 8, 3);
+        controlGrid.add(doubleBtn, 15, 6, 8, 3);
 
         //Defining mouse hover events for clear button
         doubleBtn.setOnMouseEntered(event -> {
@@ -543,9 +556,9 @@ public class PathFinderGUI extends Application {
 
         //Quadruple button to quadruple grid size
         quadrupleBtn = new Button("GRID x4");
-        quadrupleBtn.setMaxSize(90, 50);
+        quadrupleBtn.setMaxSize(90, 30);
         quadrupleBtn.setStyle("-fx-background-color: #000099; -fx-background-radius: 14; -fx-text-fill: white;");
-        controlGrid.add(quadrupleBtn, 2, 6, 8, 3);
+        controlGrid.add(quadrupleBtn, 12, 6, 8, 3);
 
         //Defining mouse hover events for clear button
         quadrupleBtn.setOnMouseEntered(event -> {
@@ -555,17 +568,17 @@ public class PathFinderGUI extends Application {
             quadrupleBtn.setStyle("-fx-background-color: #000099; -fx-background-radius: 14; -fx-text-fill: white;");
         });
 
-        costIdentifierLabel = new Text("TOTAL COST: ");
-        controlGrid.add(costIdentifierLabel, 4, 9, 3, 3);
+        Text costIdentifierLabel = new Text("TOTAL COST: ");
+        controlGrid.add(costIdentifierLabel, 4, 8, 5, 3);
 
         costLabel = new Text("0.0");
-        controlGrid.add(costLabel, 6, 9, 8, 3);
+        controlGrid.add(costLabel, 6, 8, 5, 3);
 
-        timeIdentifierLabel = new Text("TOTAL TIME: ");
-        controlGrid.add(timeIdentifierLabel, 8, 9, 3, 3);
+        Text timeIdentifierLabel = new Text("TOTAL TIME: ");
+        controlGrid.add(timeIdentifierLabel, 8, 8, 3, 3);
 
         timeLabel = new Text("0.0 seconds");
-        controlGrid.add(timeLabel, 10, 9, 8, 3);
+        controlGrid.add(timeLabel, 10, 8, 5, 3);
 
         return controlGrid;
     }
