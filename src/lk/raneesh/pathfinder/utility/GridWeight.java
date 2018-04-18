@@ -1,3 +1,12 @@
+/**
+ * Author: Raneesh Gomez
+ * IIT Student ID: 2016087
+ * UoW ID: 16266986
+ * Algorithms: Theory, Design and Implementation
+ * Coursework: Shortest Path Finder based on a grid using the A* Search Algorithm
+ * File Name: GridWeight.java
+ */
+
 package lk.raneesh.pathfinder.utility;
 
 public class GridWeight {
