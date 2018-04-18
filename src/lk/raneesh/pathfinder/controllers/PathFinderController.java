@@ -101,15 +101,6 @@ public class PathFinderController {
                 pathAbsentAlert.setContentText("Path in " + distanceMetric + " distance metric not found!");
                 pathAbsentAlert.show();
             }
-
-//        try {
-//            for (int i = 0; i < path.size(); i++) {
-//                System.out.println(path.get(i));
-//            }
-//        }
-//        catch (NullPointerException ex) {
-//            System.out.println("Path cannot be generated!");
-//        }
         } catch (ArrayIndexOutOfBoundsException ex) {
             System.out.println("Please fill out all the fields!");
         }

@@ -42,11 +42,10 @@ public class PathFinderGUI extends Application {
     private Button quadrupleBtn;
     private Button defaultGridBtn;
 
-    private static boolean isStartNodeSelected = false;
     private static int destinationNodeClickCount = 0;
+    private static boolean isStartNodeSelected = false;
     private static boolean isGridDouble = false;
     private static boolean isGridQuadruple = false;
-
     private static int rows = 20;
     private static int columns = 20;
 
@@ -569,16 +568,20 @@ public class PathFinderGUI extends Application {
         });
 
         Text costIdentifierLabel = new Text("TOTAL COST: ");
-        controlGrid.add(costIdentifierLabel, 4, 8, 5, 3);
+        costIdentifierLabel.setStyle("-fx-font-size: 11pt;");
+        controlGrid.add(costIdentifierLabel, 3, 8, 5, 3);
 
         costLabel = new Text("0.0");
+        costLabel.setStyle("-fx-font-size: 12pt; -fx-font-weight: bold;");
         controlGrid.add(costLabel, 6, 8, 5, 3);
 
         Text timeIdentifierLabel = new Text("TOTAL TIME: ");
-        controlGrid.add(timeIdentifierLabel, 8, 8, 3, 3);
+        timeIdentifierLabel.setStyle("-fx-font-size: 11pt;");
+        controlGrid.add(timeIdentifierLabel, 9, 8, 3, 3);
 
         timeLabel = new Text("0.0 seconds");
-        controlGrid.add(timeLabel, 10, 8, 5, 3);
+        timeLabel.setStyle("-fx-font-size: 12pt; -fx-font-weight: bold;");
+        controlGrid.add(timeLabel, 12, 8, 10, 3);
 
         return controlGrid;
     }
