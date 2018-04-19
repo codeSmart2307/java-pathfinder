@@ -37,27 +37,47 @@ public class PathFinderGUI extends Application {
 
     private GridPane landscapeGrid;
 
+    // Label to display the total cost for the path
     private Text costLabel;
+    // Label to display the total time for the algorithm execution
     private Text timeLabel;
+    // Input field for the start x coordinate
     private TextField sourceXInput;
+    // Input field for the start y coordinate
     private TextField sourceYInput;
+    // Input field for the end x coordinate
     private TextField destinationXInput;
+    // Input field for the end y coordinate
     private TextField destinationYInput;
+    // Radio button group for heuristic selection
     private ToggleGroup heuristicGroup;
+    // Button to clear input fields for coordinate pairs
     private Button clearFieldsBtn;
+    // Button to run the program
     private Button runBtn;
+    // Button to clear the path drawn
     private Button clearPathBtn;
+    // Button to double the grid size
     private Button doubleBtn;
+    // Button to quadruple the grid size
     private Button quadrupleBtn;
+    // Button to generate a grid with the default size
     private Button defaultGridBtn;
 
+    // Counter for destination node click event
     private static int destinationNodeClickCount = 0;
+    // Boolean flag to check if start node is selected
     private static boolean isStartNodeSelected = false;
+    // Boolean flag to check if the grid is doubled
     private static boolean isGridDouble = false;
+    // Boolean flag to check if the grid is quadrupled
     private static boolean isGridQuadruple = false;
+    // Number of rows of the landscape grid
     private static int rows = 20;
+    // Number of columns of the landscape grid
     private static int columns = 20;
 
+    // Getters for the rows and columns instance variables
     public static int getRows() {
         return rows;
     }
