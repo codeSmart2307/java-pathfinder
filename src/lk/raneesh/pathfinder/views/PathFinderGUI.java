@@ -72,12 +72,15 @@ public class PathFinderGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // BorderPane holds both GridPanes containing the GUI controls and the landscape
         BorderPane primaryBorderPane = new BorderPane();
         primaryBorderPane.setPadding(new Insets(20, 50, 50, 50));
         primaryBorderPane.setPrefSize(800, 800);
 
+        // Control GridPane is set to the top of BorderPane
         primaryBorderPane.setTop(generateControls());
 
+        // Time taken to initialize the landscape grid
         Stopwatch gridGenerateTime = new Stopwatch();
         primaryBorderPane.setCenter(generateLandscape());
         System.out.println("Grid Generation | Time Elapsed: " + gridGenerateTime.elapsedTime() + " seconds");
@@ -92,6 +95,7 @@ public class PathFinderGUI extends Application {
     }
 
     public void getInput(BorderPane borderPane) {
+        // Button which clears the text fields containing coordinate pairs
         clearFieldsBtn.setOnMouseClicked(event -> {
             sourceXInput.setText("");
             sourceYInput.setText("");
@@ -103,6 +107,7 @@ public class PathFinderGUI extends Application {
             PathFinderController.endJ = -1;
 
         });
+        // Button which sets the landscape grid to the default size of 20*20
         defaultGridBtn.setOnMouseClicked(event -> {
             rows = 20;
             columns = 20;
@@ -110,6 +115,7 @@ public class PathFinderGUI extends Application {
             isGridQuadruple = false;
             borderPane.setCenter(generateLandscape());
         });
+        // Button which sets the landscape grid to double the default size to 40*40
         doubleBtn.setOnMouseClicked(event -> {
             rows = 40;
             columns = 40;
@@ -123,6 +129,7 @@ public class PathFinderGUI extends Application {
             PathFinderController.gridNodes = new CellNode[rows][columns];
             borderPane.setCenter(generateLandscape());
         });
+        // Button which sets the landscape grid to quadruple the default size to 80*80
         quadrupleBtn.setOnMouseClicked(event -> {
             rows = 80;
             columns = 80;
@@ -136,6 +143,7 @@ public class PathFinderGUI extends Application {
             PathFinderController.gridNodes = new CellNode[rows][columns];
             borderPane.setCenter(generateLandscape());
         });
+        // Button which clears the path drawn
         clearPathBtn.setOnMouseClicked(event -> {
             borderPane.setCenter(generateLandscape());
             isStartNodeSelected = false;
@@ -144,11 +152,15 @@ public class PathFinderGUI extends Application {
             PathFinderController.openNodes = null;
             PathFinderController.path = null;
         });
+        // Button which runs the algorithm and draws the path
         runBtn.setOnMouseClicked(event -> {
+            // Total time taken for the program to complete execution to draw a single path
             Stopwatch totalTime = new Stopwatch();
             try {
+                // If all the coordinate fields are filled
                 if (!sourceXInput.getText().equals("") && !sourceYInput.getText().equals("") && !destinationXInput.getText().equals("") && !destinationYInput.getText().equals("")) {
                     try {
+                        // If the start node field x value is a valid value between the size of rows and columns
                         if (Integer.parseInt(sourceXInput.getText()) >= 0 && Integer.parseInt(sourceXInput.getText()) <= (rows - 1)) {
                             PathFinderController.startI = Integer.parseInt(sourceXInput.getText());
                         } else {
@@ -157,6 +169,7 @@ public class PathFinderGUI extends Application {
                             sourceXAlert.setContentText("Starting Point X Coordinate Out of Bounds!");
                             sourceXAlert.show();
                         }
+                        // If the start node field y value is a valid value between the size of rows and columns
                         if (Integer.parseInt(sourceYInput.getText()) >= 0 && Integer.parseInt(sourceYInput.getText()) <= (rows - 1)) {
                             PathFinderController.startJ = Integer.parseInt(sourceYInput.getText());
                         } else {
@@ -165,6 +178,7 @@ public class PathFinderGUI extends Application {
                             sourceYAlert.setContentText("Starting Point Y Coordinate Out of Bounds!");
                             sourceYAlert.show();
                         }
+                        // If the end node field x value is a valid value between the size of rows and columns
                         if (Integer.parseInt(destinationXInput.getText()) >= 0 && Integer.parseInt(destinationXInput.getText()) <= (rows - 1)) {
                             PathFinderController.endI = Integer.parseInt(destinationXInput.getText());
                         } else {
@@ -173,6 +187,7 @@ public class PathFinderGUI extends Application {
                             destinationXAlert.setContentText("Ending Point X Coordinate Out of Bounds!");
                             destinationXAlert.show();
                         }
+                        // If the end node field y value is a valid value between the size of rows and columns
                         if (Integer.parseInt(destinationYInput.getText()) >= 0 && Integer.parseInt(destinationYInput.getText()) <= (rows - 1)) {
                             PathFinderController.endJ = Integer.parseInt(destinationYInput.getText());
                         } else {
@@ -201,6 +216,7 @@ public class PathFinderGUI extends Application {
                 // Assign selected radio button value to distance metric variable in controller class
                 PathFinderController.distanceMetric = heuristicValue;
 
+                // Time taken to execute the search algorithm
                 Stopwatch algorithmRunTime = new Stopwatch();
                 PathFinderController.runPathfinder();
                 timeLabel.setText(String.valueOf(algorithmRunTime.elapsedTime()) + " seconds");
@@ -214,6 +230,7 @@ public class PathFinderGUI extends Application {
                     gridCellArr = GridWeight.getQuadrupledGridWeight();
                 }
 
+                // Time taken for the path to be drawn
                 Stopwatch drawTime = new Stopwatch();
                 for (int k = 0; k < PathFinderController.path.size(); k++) {
                     Circle pathCircle = new Circle();
@@ -240,6 +257,7 @@ public class PathFinderGUI extends Application {
         });
     }
 
+    // Method which generates the landscape
     public GridPane generateLandscape() {
         landscapeGrid = new GridPane();
         landscapeGrid.setPadding(new Insets(0, 0, 0, 0));
@@ -264,6 +282,7 @@ public class PathFinderGUI extends Application {
             landscapeGrid.getColumnConstraints().add(columnConstraints);
         }
 
+        // Gets the area size of the grid
         NumberBinding rectangleAreaSize = Bindings.min(landscapeGrid.heightProperty(), landscapeGrid.widthProperty());
 
         int[][] gridCellArr = GridWeight.getGridWeight();
@@ -278,10 +297,12 @@ public class PathFinderGUI extends Application {
             for (int j = 0; j < gridCellArr.length; j++) {
                 Rectangle gridCell = new Rectangle();
 
+                // Initialize the landscape grid with a cell node for each grid cell
                 CellNode gridCellNode = new CellNode(i, j);
-                gridCellNode.setgCost(Integer.MAX_VALUE);
+                gridCellNode.setgCost(Integer.MAX_VALUE); // Assign the gCost of each node as Integer.MAX_VALUE to simulate infinity
                 PathFinderController.gridNodes[i][j] = gridCellNode;
 
+                // Assign the rectangle colors according to the weights specified
                 switch (gridCellArr[i][j]) {
                     case 1:
                         gridCell.setFill(Color.web("#00DD00"));
@@ -352,10 +373,11 @@ public class PathFinderGUI extends Application {
                         break;
                 }
 
+                // Add the rectangle to the grid array
                 landscapeGrid.add(gridCell, j, i);
 
+                // Click events for the starting and ending nodes
                 gridCell.setOnMouseClicked(event -> {
-
                     if (!isStartNodeSelected) {
                         isStartNodeSelected = true;
                         Node source = (Node) event.getSource();
@@ -403,12 +425,13 @@ public class PathFinderGUI extends Application {
                 gridCell.setHeight(30);
                 gridCell.setWidth(30);
 
+                // Adjusting rectangle size according to the size of the grid
                 if (isGridDouble && !isGridQuadruple) {
                     gridCell.widthProperty().bind(rectangleAreaSize.divide(50));
                     gridCell.heightProperty().bind(rectangleAreaSize.divide(50));
                 } else if (isGridQuadruple && !isGridDouble) {
-                    gridCell.widthProperty().bind(rectangleAreaSize.divide(400));
-                    gridCell.heightProperty().bind(rectangleAreaSize.divide(600));
+                    gridCell.widthProperty().bind(rectangleAreaSize.divide(100));
+                    gridCell.heightProperty().bind(rectangleAreaSize.divide(100));
                 }
             }
         }
@@ -416,6 +439,7 @@ public class PathFinderGUI extends Application {
         return landscapeGrid;
     }
 
+    // Method which generates the controls for the program
     public GridPane generateControls() {
         GridPane controlGrid = new GridPane();
         controlGrid.setPadding(new Insets(10, 10, 10, 25));

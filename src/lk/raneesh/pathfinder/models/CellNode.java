@@ -11,19 +11,29 @@ package lk.raneesh.pathfinder.models;
 
 public class CellNode {
 
+    // x coordinate for cell node
     private int i;
+    // y coordinate for cell node
     private int j;
+    // Distance from starting node to cell node
     private double gCost;
+    // Heuristic cost for cell node based on ending node
     private double heuristicCost;
+    // Final Cost = gCost + heuristicCost
     private double finalCost;
+    // Parent cell node of cell node
     private CellNode parentNode;
+    // Boolean flag to detect visited status
     private boolean isVisited;
+    // Boolean flag to detect blocked status
     private boolean isBlocked;
 
     public CellNode(int i, int j) {
         this.i = i;
         this.j = j;
     }
+
+    // Getters and Setters for instance variables
 
     public int getI() {
         return i;

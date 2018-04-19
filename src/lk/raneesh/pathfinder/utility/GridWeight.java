@@ -11,6 +11,7 @@ package lk.raneesh.pathfinder.utility;
 
 public class GridWeight {
 
+    // Weights for the 20*20 Grid with 400 nodes
     public static int[][] getGridWeight() {
         int[][] gridWeights = {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1},
@@ -38,6 +39,7 @@ public class GridWeight {
         return gridWeights;
     }
 
+    // Weights for the 40*40 Grid with 1600 nodes
     public static int[][] getDoubledGridWeight() {
         int[][] doubledGridWeights = {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -85,6 +87,7 @@ public class GridWeight {
         return doubledGridWeights;
     }
 
+    // Weights for the 80*80 Grid with 6400 nodes
     public static int[][] getQuadrupledGridWeight() {
         int[][] quadrupledGridWeight = {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
